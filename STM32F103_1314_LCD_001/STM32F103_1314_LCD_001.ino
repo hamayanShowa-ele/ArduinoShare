@@ -1,6 +1,6 @@
 #include  "BOARD_DEPENDENCY.h"
 #include  <sg12864.h>
-#include  "ascii8x14_font.h"  /* If you have put the font data in a local folder, enable it here. */
+//#include  "ascii8x14_font.h"  /* If you have put the font data in a local folder, enable it here. */
 #include  <ascii8x14_font.h>  /* If you have put the font data in a libralies folder, enable it here. */
 
 static const SG12864_PINS pins =
