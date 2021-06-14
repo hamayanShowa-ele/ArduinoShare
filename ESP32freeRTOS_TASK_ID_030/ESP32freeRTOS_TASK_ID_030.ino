@@ -1,4 +1,5 @@
 xQueueHandle que;
+xTaskHandle taskHandle[ 3 ];
 
 void setup()
 {
@@ -15,7 +16,7 @@ void setup()
     configMINIMAL_STACK_SIZE,   /* stack size */
     NULL,   /* execute parameter */
     1,      /* task priority : 0 to 24. 0 is lowest priority. */
-    NULL,   /* task handle pointer */
+    &taskHandle[ 0 ],   /* task handle pointer */
     1       /* core ID */
   );
 
@@ -26,7 +27,7 @@ void setup()
     configMINIMAL_STACK_SIZE,   /* stack size */
     NULL,   /* execute parameter */
     2,      /* task priority : 0 to 24. 0 is lowest priority. */
-    NULL,   /* task handle pointer */
+    &taskHandle[ 1 ],   /* task handle pointer */
     1       /* core ID */
   );
 
@@ -37,24 +38,40 @@ void setup()
     configMINIMAL_STACK_SIZE,   /* stack size */
     NULL,   /* execute parameter */
     3,      /* task priority : 0 to 24. 0 is lowest priority. */
-    NULL,   /* task handle pointer */
+    &taskHandle[ 2 ],   /* task handle pointer */
     1       /* core ID */
   );
-
-  vTaskDelete( NULL );  /* delete loopTask. */
 }
 
 void loop()
 {
+  unsigned portBASE_TYPE stzckSize;
+  stzckSize = uxTaskGetStackHighWaterMark( taskHandle[ 0 ] );
+  Serial.print( "task1 remain stack size = " ); Serial.println( stzckSize, DEC );
+
+  stzckSize = uxTaskGetStackHighWaterMark( taskHandle[ 1 ] );
+  Serial.print( "task2 remain stack size = " ); Serial.println( stzckSize, DEC );
+
+  stzckSize = uxTaskGetStackHighWaterMark( taskHandle[ 2 ] );
+  Serial.print( "task3 remain stack size = " ); Serial.println( stzckSize, DEC );
+
+  TaskHandle_t loopTaskHandle = xTaskGetCurrentTaskHandle();
+  stzckSize = uxTaskGetStackHighWaterMark( loopTaskHandle );
+  Serial.print( "loopTask remain stack size = " ); Serial.println( stzckSize, DEC );
+
+  vTaskDelay( pdMS_TO_TICKS( 1000 ) );
 }
 
 void gateKeeperTask( void *execParam )
 {
+  char buffer[ 128 ];
   while( 1 )
   {
     char *pvBuffer;
     xQueueReceive( que, (void *)&pvBuffer, portMAX_DELAY );
-    Serial.print( pvBuffer );
+    strcpy( buffer, pvBuffer );
+    Serial.print( buffer );
+//    Serial.print( pvBuffer );
   }
 }
 
