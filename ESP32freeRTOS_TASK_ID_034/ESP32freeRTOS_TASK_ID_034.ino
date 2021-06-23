@@ -18,7 +18,7 @@
 
  *************************************************************
 
-  You’ll need:
+  You will need:
    - Blynk App (download from AppStore or Google Play)
    - ESP32 board
    - Decide how to connect to Blynk
