@@ -124,6 +124,7 @@ void SG12864_IF::begin()
   pinMode( pins.bl, OUTPUT );
 
   reset();
+  delay( 30UL );
 }
 
 
