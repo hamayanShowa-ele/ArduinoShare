@@ -18,7 +18,7 @@
 
  *************************************************************
 
-  You’ll need:
+  You ??? need:
    - Blynk App (download from AppStore or Google Play)
    - Arduino Uno board
    - Decide how to connect to Blynk
@@ -32,7 +32,7 @@
  *************************************************************/
 
 /* Comment this out to disable prints and save space */
-#define BLYNK_PRINT Serial
+#define  BLYNK_PRINT Serial1
 #include <SPI.h>
 #include <Ethernet2.h>
 #include <BlynkSimpleEthernet2.h>
@@ -93,10 +93,14 @@ char auth[] = "type your blynk token.";  // token
 
 #define  LCD_RES    PB5
 
+HardwareSerial Serial1( RXD1, TXD1 );  // rxd pin, txd pin
+
 void setup()
 {
   // Debug console
-  Serial.begin( 115200UL );
+  Serial1.begin( 115200UL );
+  while( !Serial1 ) delay( 20UL );
+  Serial1.println( "\r\n\r\nSTM32F4 2102 BLYNK test." );
 
   pinMode( ACT_LED, OUTPUT );
   digitalWrite( ACT_LED, LOW );
@@ -110,12 +114,16 @@ void setup()
   SPI.setMISO( SPI2_MISO );
   SPI.setMOSI( SPI2_MOSI );
   SPI.setSCLK( SPI2_SCK );
-  SPI.setSSEL( W5500_CS );
 
-  Blynk.begin( auth );  // or Blynk.begin( auth, uint8_t *mac );
+//  SPI.setSSEL( W5500_CS );
+  // The BLYNK library sets the CS pin of the Ethernet IC (W5500) as the default SPI pin, and does not call the EthernetClass init (uint8_t cspin), so we need to set the CS pin here.
+  Ethernet.init( W5500_CS );
+
   // You can also specify server:
-  //Blynk.begin(auth, "blynk-cloud.com", 80);
-  //Blynk.begin(auth, IPAddress(192,168,1,100), 8080);
+  Blynk.begin( auth );  // dhcp using and An appropriate MAC address.
+  // Blynk.begin( auth, BLYNK_DEFAULT_DOMAIN, BLYNK_SERVER_PORT, const byte mac[] );  // dhcp using and A valid MAC address.
+  // Blynk.begin(auth, "blynk-cloud.com", 80);
+  // Blynk.begin(auth, IPAddress(192,168,100,250), 8080);
 }
 
 void loop()
