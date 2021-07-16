@@ -1,0 +1,10 @@
+# git ignore file
+# designed by hamayan.
+
+# not need author.h
+author.h
+
+# not need hoge folder
+# hoge/
+
+
