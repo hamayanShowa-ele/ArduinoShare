@@ -32,6 +32,7 @@
 #include  <Wire.h>
 #include  <Ethernet2.h>
 #include  <BlynkSimpleEthernet2.h>
+#include  <rom24aa025.h>
 
 // You should get Auth Token in the Blynk App.
 // Go to the Project Settings (nut icon).
@@ -48,9 +49,9 @@ char auth[] = "type your blynk token.";  // token
   defines.
 */
 #define  SET_OVERFLOW   (720UL)
-#define  CURRENT_PERIOD (1000UL)  // ms
+#define  CURRENT_MAX_VALUE  (12.0F)  // mA
 #define  CURRENT_SETUP_PERIOD  (20UL)  // ms
-#define  CURRENT_HOLD_PERIOD   (20UL)  // ms
+#define  CURRENT_HOLD_PERIOD   (20UL + 500UL)  // ms
 #define  TRIGGER_SETUP_PERIOD  (20UL + 100UL)  // ms
 #define  TRIGGER_HOLD_PERIOD   (100UL)  // ms
 
@@ -113,7 +114,8 @@ char auth[] = "type your blynk token.";  // token
 */
 STM32F_CPU_IDENTITY cpu_id;
 HardwareSerial Serial1( RXD1, TXD1 );  // rxd pin, txd pin
-TwoWire i2c2( SDA2, SCL2 );
+TwoWire i2c2;
+EEPROM_24AA025 eeprom( &i2c2 );
 
 HardwareTimer Timer5( TIM5 );
 HardwareTimer Timer3( TIM3 );
@@ -123,13 +125,69 @@ uint32_t tim3Scale,tim3PwmPulse[2];
 IPAddress myip( 192,168,100,231 );
 IPAddress dnsip( 192,168,100,1 );
 
-const byte mac[] = {0x00, 0x1E, 0xC0, 0xF7, 0xEE, 0x67 };
+//const byte mac[] = {0x00, 0x1E, 0xC0, 0xF7, 0xEE, 0x67 };
+uint8_t mac[6];
 
 bool currentOutput = false;
 bool blynkLinked = false;
 uint32_t ledBlynkTime;
 uint32_t currentSetupTimer, currentHoldTimer;
 uint32_t triggerSetupTimer, triggerHoldTimer;
+
+typedef struct
+{
+  int32_t minus;
+  int32_t plus;
+  int32_t zero;
+} GAIN_AND_OFFSET;
+
+#define  PWM1_OFFSET   (-5)
+#define  PWM2_OFFSET   (-10)  // (-7)
+#define  PWM3_OFFSET   (-5)
+#define  PWM4_OFFSET   (-5)
+#define  PWM5_OFFSET   (-5)
+#define  PWM6_OFFSET   (-5)
+
+GAIN_AND_OFFSET gainAndOffset[] =
+{
+  /* PWM1 */
+  {
+    360 + (int32_t)((360 * 10 * 1.108F) / 12.0F) + PWM1_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.100F) / 12.0F) + PWM1_OFFSET,  // plus
+    360 + PWM1_OFFSET,  // zero
+  },
+  /* PWM2 */
+  {
+    360 + (int32_t)((360 * 10 * 1.115F) / 12.0F) + PWM2_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.090F) / 12.0F) + PWM2_OFFSET,  // plus
+    360 + PWM2_OFFSET,  // zero
+  },
+  /* PWM3 */
+  {
+    360 + (int32_t)((360 * 10 * 1.108F) / 12.0F) + PWM3_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.100F) / 12.0F) + PWM3_OFFSET,  // plus
+    360 + PWM3_OFFSET,  // zero
+  },
+  /* PWM4 */
+  {
+    360 + (int32_t)((360 * 10 * 1.115F) / 12.0F) + PWM4_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.106F) / 12.0F) + PWM4_OFFSET,  // plus
+    360 + PWM4_OFFSET,  // zero
+  },
+  /* PWM5 */
+  {
+    360 + (int32_t)((360 * 10 * 1.110F) / 12.0F) + PWM5_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.105F) / 12.0F) + PWM5_OFFSET,  // plus
+    360 + PWM5_OFFSET,  // zero
+  },
+  /* PWM6 */
+  {
+    360 + (int32_t)((360 * 10 * 1.11F) / 12.0F) + PWM6_OFFSET,  // minus
+    360 - (int32_t)((360 * 10 * 1.106F) / 12.0F) + PWM6_OFFSET,  // plus
+    360 + PWM6_OFFSET,  // zero
+  },
+};
+
 
 /*
   setup.
@@ -172,6 +230,17 @@ void setup()
   msg += " UID2:0x"; msg += String( uid[2], HEX );
   Serial1.println( msg );
 
+  /* I2C2 initialize. */
+  i2c2.setSDA( SDA2 );  /* SDA */
+  i2c2.setSCL( SCL2 );  /* SCL */
+  i2c2.begin();
+
+  /* read the mac address from the i2c eeprom. */
+  eeprom.read( MAC_ADDRESS_IN_24AA025E48, mac, (int)sizeof(mac) );
+  Serial1.printf( "mac %02X:%02X:%02X:%02X:%02X:%02X\n",
+    mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]  );
+  Serial1.println();
+
   /* TIMER5 initialize and output zero level. */
   Timer5.pause();  // Pause counter and all output channels
   // set prescaler register (which is factor value - 1)
@@ -179,9 +248,13 @@ void setup()
   // set AutoReload register depending on format provided
   Timer5.setOverflow( SET_OVERFLOW );
   tim5Scale = Timer5.getOverflow() / 2UL;
+
+  tim5PwmPulse[0] = gainAndOffset[0].zero;
+  tim5PwmPulse[1] = gainAndOffset[1].zero;
+  tim5PwmPulse[2] = gainAndOffset[2].zero;
+  tim5PwmPulse[3] = gainAndOffset[3].zero;
   for( int i = 0; i < (int)(sizeof(tim5PwmPulse) / sizeof(tim5PwmPulse[0])); i++ )
   {
-    tim5PwmPulse[i] = tim5Scale;
     Serial1.print( "tim5PwmPulse = " ); Serial1.println( String( tim5PwmPulse[i] ) );
   }
 
@@ -206,9 +279,11 @@ void setup()
   // set AutoReload register depending on format provided
   Timer3.setOverflow( SET_OVERFLOW );
   tim3Scale = Timer3.getOverflow() / 2UL;
+
+  tim3PwmPulse[0] = gainAndOffset[4].zero;
+  tim3PwmPulse[1] = gainAndOffset[5].zero;
   for( int i = 0; i < (int)(sizeof(tim3PwmPulse) / sizeof(tim3PwmPulse[0])); i++ )
   {
-    tim3PwmPulse[i] = tim3Scale;
     Serial1.print( "tim3PwmPulse = " ); Serial1.println( String( tim3PwmPulse[i] ) );
   }
 
@@ -226,14 +301,12 @@ void setup()
   SPI.setMISO( SPI2_MISO );
   SPI.setMOSI( SPI2_MOSI );
   SPI.setSCLK( SPI2_SCK );
-//  SPI.setSSEL( W5500_CS );
 
   // The BLYNK library sets the CS pin of the Ethernet IC (W5500) as the default SPI pin, and does not call the EthernetClass init (uint8_t cspin), so we need to set the CS pin here.
   Ethernet.init( W5500_CS );
 //  Blynk.begin( auth );  // dhcp using and An appropriate MAC address.
   Blynk.begin( auth, BLYNK_DEFAULT_DOMAIN, BLYNK_SERVER_PORT, mac );  // dhcp using and A valid MAC address.
 //  Blynk.begin( auth, BLYNK_DEFAULT_DOMAIN, BLYNK_SERVER_PORT, myip, dnsip, mac );
-
   myip = Ethernet.localIP();
   Serial1.print( "myip " ); Serial1.println( myip );
 
@@ -293,12 +366,12 @@ Serial1.println( "CURRENT turn ON." );
     Timer3.setCaptureCompare( PWM5_CHANNEL, tim3Scale );
     Timer3.setCaptureCompare( PWM6_CHANNEL, tim3Scale );
 #else
-    TIM5->CCR1 = (uint16_t)tim5Scale;
-    TIM5->CCR2 = (uint16_t)tim5Scale;
-    TIM5->CCR3 = (uint16_t)tim5Scale;
-    TIM5->CCR4 = (uint16_t)tim5Scale;
-    TIM3->CCR1 = (uint16_t)tim3Scale;
-    TIM3->CCR2 = (uint16_t)tim3Scale;
+    TIM5->CCR1 = (uint16_t)gainAndOffset[0].zero;
+    TIM5->CCR2 = (uint16_t)gainAndOffset[1].zero;
+    TIM5->CCR3 = (uint16_t)gainAndOffset[2].zero;
+    TIM5->CCR4 = (uint16_t)gainAndOffset[3].zero;
+    TIM3->CCR1 = (uint16_t)gainAndOffset[4].zero;
+    TIM3->CCR2 = (uint16_t)gainAndOffset[5].zero;
 #endif
     currentHoldTimer = 0xFFFFFFFF;
 Serial1.println( "CURRENT turn OFF." );
@@ -353,12 +426,12 @@ BLYNK_WRITE( V0 ) //
     }
     else
     {
-      Timer5.setCaptureCompare( PWM1_CHANNEL, tim5Scale );
-      Timer5.setCaptureCompare( PWM2_CHANNEL, tim5Scale );
-      Timer5.setCaptureCompare( PWM3_CHANNEL, tim5Scale );
-      Timer5.setCaptureCompare( PWM4_CHANNEL, tim5Scale );
-      Timer3.setCaptureCompare( PWM5_CHANNEL, tim3Scale );
-      Timer3.setCaptureCompare( PWM6_CHANNEL, tim3Scale );
+      Timer5.setCaptureCompare( PWM1_CHANNEL, gainAndOffset[0].zero );
+      Timer5.setCaptureCompare( PWM2_CHANNEL, gainAndOffset[1].zero );
+      Timer5.setCaptureCompare( PWM3_CHANNEL, gainAndOffset[2].zero );
+      Timer5.setCaptureCompare( PWM4_CHANNEL, gainAndOffset[3].zero );
+      Timer3.setCaptureCompare( PWM5_CHANNEL, gainAndOffset[4].zero );
+      Timer3.setCaptureCompare( PWM6_CHANNEL, gainAndOffset[5].zero );
     }
   }
 //  Serial1.println( "V0" );
@@ -402,60 +475,150 @@ BLYNK_WRITE( V7 ) //
 BLYNK_WRITE( V1 ) // PWM1
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim5Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim5PwmPulse[0] = tim5Scale - tempUL;
   Serial1.print( "PWM1:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim5PwmPulse[0] = (uint32_t)gainAndOffset[0].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[0].zero - gainAndOffset[0].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[0].zero - value;
+    tim5PwmPulse[0] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[0].minus - gainAndOffset[0].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[0].zero - value;
+    tim5PwmPulse[0] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim5PwmPulse[0] ) );
 }
 
 BLYNK_WRITE( V2 ) // PWM2
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim5Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim5PwmPulse[1] = tim5Scale - tempUL;
   Serial1.print( "PWM2:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim5PwmPulse[1] = (uint32_t)gainAndOffset[1].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[1].zero - gainAndOffset[1].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[1].zero - value;
+    tim5PwmPulse[1] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[1].minus - gainAndOffset[1].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[1].zero - value;
+    tim5PwmPulse[1] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim5PwmPulse[1] ) );
 }
 
 BLYNK_WRITE( V3 ) // PWM3
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim5Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim5PwmPulse[2] = tim5Scale - tempUL;
   Serial1.print( "PWM3:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim5PwmPulse[2] = (uint32_t)gainAndOffset[2].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[2].zero - gainAndOffset[2].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[2].zero - value;
+    tim5PwmPulse[2] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[2].minus - gainAndOffset[2].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[2].zero - value;
+    tim5PwmPulse[2] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim5PwmPulse[2] ) );
 }
 
 BLYNK_WRITE( V4 ) // PWM4
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim5Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim5PwmPulse[3] = tim5Scale - tempUL;
   Serial1.print( "PWM4:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim5PwmPulse[3] = (uint32_t)gainAndOffset[3].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[3].zero - gainAndOffset[3].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[3].zero - value;
+    tim5PwmPulse[3] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[3].minus - gainAndOffset[3].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[3].zero - value;
+    tim5PwmPulse[3] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim5PwmPulse[3] ) );
 }
 
 BLYNK_WRITE( V5 ) // PWM5
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim3Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim3PwmPulse[0] = tim3Scale - tempUL;
   Serial1.print( "PWM5:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim3PwmPulse[0] = (uint32_t)gainAndOffset[4].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[4].zero - gainAndOffset[4].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[4].zero - value;
+    tim3PwmPulse[0] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[4].minus - gainAndOffset[4].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[4].zero - value;
+    tim3PwmPulse[0] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim3PwmPulse[0] ) );
 }
 
 BLYNK_WRITE( V6 ) // PWM6
 { 
   float value = param.asFloat();
-  int32_t tempUL = (int32_t)tim3Scale;
-  tempUL = (int32_t)(tempUL * value / 10.0F);
-  tim3PwmPulse[1] = tim3Scale - tempUL;
   Serial1.print( "PWM6:" ); Serial1.print( String( value ) );
+  if( value == 0.0F )
+  {
+    tim3PwmPulse[1] = (uint32_t)gainAndOffset[5].zero;
+  }
+  else if( value > 0.0F )
+  {
+    int32_t scale = gainAndOffset[5].zero - gainAndOffset[5].plus;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[5].zero - value;
+    tim3PwmPulse[1] = (uint32_t)value;
+  }
+  else
+  {
+    int32_t scale = gainAndOffset[5].minus - gainAndOffset[5].zero;
+    value = scale * value / 10.0F;
+    value = gainAndOffset[5].zero - value;
+    tim3PwmPulse[1] = (uint32_t)value;
+  }
   Serial1.print( " WIDTH:" ); Serial1.println( String( tim3PwmPulse[1] ) );
 }
 
