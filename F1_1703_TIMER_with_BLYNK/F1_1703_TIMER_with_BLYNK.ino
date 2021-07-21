@@ -41,7 +41,7 @@
 //  that you got yourself as follows instead.
 #include  "author.h"
 #ifndef  __AUTHORED__
-char auth[] = "type your blynk token.";  // token
+char auth[] = "type your blynk project token.";  // token
 #endif  /* __AUTHORED__ */
 
 
@@ -49,6 +49,7 @@ char auth[] = "type your blynk token.";  // token
   defines.
 */
 #define  SET_OVERFLOW   (720UL)
+#define  CENTER_VALUE   (SET_OVERFLOW / 2UL)
 #define  CURRENT_MAX_VALUE  (12.0F)  // mA
 #define  CURRENT_SETUP_PERIOD  (20UL)  // ms
 #define  CURRENT_HOLD_PERIOD   (20UL + 500UL)  // ms
@@ -116,7 +117,6 @@ STM32F_CPU_IDENTITY cpu_id;
 HardwareSerial Serial1( RXD1, TXD1 );  // rxd pin, txd pin
 TwoWire i2c2;
 EEPROM_24AA025 eeprom( &i2c2 );
-
 HardwareTimer Timer5( TIM5 );
 HardwareTimer Timer3( TIM3 );
 uint32_t tim5Scale,tim5PwmPulse[4];
@@ -142,52 +142,53 @@ typedef struct
 } GAIN_AND_OFFSET;
 
 #define  PWM1_OFFSET   (-5)
-#define  PWM2_OFFSET   (-10)  // (-7)
+#define  PWM2_OFFSET   (-5)
 #define  PWM3_OFFSET   (-5)
 #define  PWM4_OFFSET   (-5)
 #define  PWM5_OFFSET   (-5)
 #define  PWM6_OFFSET   (-5)
+#define  PWM7_OFFSET   (-5)
+#define  PWM8_OFFSET   (-5)
 
-GAIN_AND_OFFSET gainAndOffset[] =
+static const GAIN_AND_OFFSET gainAndOffset[] =
 {
   /* PWM1 */
   {
-    360 + (int32_t)((360 * 10 * 1.108F) / 12.0F) + PWM1_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.100F) / 12.0F) + PWM1_OFFSET,  // plus
-    360 + PWM1_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.108F) / 12.0F) + PWM1_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.100F) / 12.0F) + PWM1_OFFSET,  // plus
+    CENTER_VALUE + PWM1_OFFSET,  // zero
   },
   /* PWM2 */
   {
-    360 + (int32_t)((360 * 10 * 1.115F) / 12.0F) + PWM2_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.090F) / 12.0F) + PWM2_OFFSET,  // plus
-    360 + PWM2_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.115F) / 12.0F) + PWM2_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.105F) / 12.0F) + PWM2_OFFSET,  // plus
+    CENTER_VALUE + PWM2_OFFSET,  // zero
   },
   /* PWM3 */
   {
-    360 + (int32_t)((360 * 10 * 1.108F) / 12.0F) + PWM3_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.100F) / 12.0F) + PWM3_OFFSET,  // plus
-    360 + PWM3_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.108F) / 12.0F) + PWM3_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.100F) / 12.0F) + PWM3_OFFSET,  // plus
+    CENTER_VALUE + PWM3_OFFSET,  // zero
   },
   /* PWM4 */
   {
-    360 + (int32_t)((360 * 10 * 1.115F) / 12.0F) + PWM4_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.106F) / 12.0F) + PWM4_OFFSET,  // plus
-    360 + PWM4_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.115F) / 12.0F) + PWM4_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.106F) / 12.0F) + PWM4_OFFSET,  // plus
+    CENTER_VALUE + PWM4_OFFSET,  // zero
   },
   /* PWM5 */
   {
-    360 + (int32_t)((360 * 10 * 1.110F) / 12.0F) + PWM5_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.105F) / 12.0F) + PWM5_OFFSET,  // plus
-    360 + PWM5_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.110F) / 12.0F) + PWM5_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.105F) / 12.0F) + PWM5_OFFSET,  // plus
+    CENTER_VALUE + PWM5_OFFSET,  // zero
   },
   /* PWM6 */
   {
-    360 + (int32_t)((360 * 10 * 1.11F) / 12.0F) + PWM6_OFFSET,  // minus
-    360 - (int32_t)((360 * 10 * 1.106F) / 12.0F) + PWM6_OFFSET,  // plus
-    360 + PWM6_OFFSET,  // zero
+    CENTER_VALUE + (int32_t)((CENTER_VALUE * 10.0F * 1.110F) / 12.0F) + PWM6_OFFSET,  // minus
+    CENTER_VALUE - (int32_t)((CENTER_VALUE * 10.0F * 1.106F) / 12.0F) + PWM6_OFFSET,  // plus
+    CENTER_VALUE + PWM6_OFFSET,  // zero
   },
 };
-
 
 /*
   setup.
@@ -246,7 +247,7 @@ void setup()
   // set prescaler register (which is factor value - 1)
   Timer5.setPrescaleFactor( 1UL );
   // set AutoReload register depending on format provided
-  Timer5.setOverflow( SET_OVERFLOW );
+  Timer5.setOverflow( SET_OVERFLOW );  // ex. 72000000 / 1 / 720 = 100kHz
   tim5Scale = Timer5.getOverflow() / 2UL;
 
   tim5PwmPulse[0] = gainAndOffset[0].zero;
@@ -269,15 +270,12 @@ void setup()
   Timer5.setCaptureCompare( PWM3_CHANNEL, tim5PwmPulse[2] );
   Timer5.setCaptureCompare( PWM4_CHANNEL, tim5PwmPulse[3] );
 
-//  Timer5.attachInterrupt( timer5OverFlowCB );
-  Timer5.resume(); // Resume counter and all output channels
-
   /* TIMER3 initialize and output zero level. */
   Timer3.pause();  // Pause counter and all output channels
   // set prescaler register (which is factor value - 1)
   Timer3.setPrescaleFactor( 1UL );
   // set AutoReload register depending on format provided
-  Timer3.setOverflow( SET_OVERFLOW );
+  Timer3.setOverflow( SET_OVERFLOW );  // ex. 72000000 / 1 / 720 = 100kHz
   tim3Scale = Timer3.getOverflow() / 2UL;
 
   tim3PwmPulse[0] = gainAndOffset[4].zero;
@@ -294,8 +292,14 @@ void setup()
   Timer3.setCaptureCompare( PWM5_CHANNEL, tim3PwmPulse[0] );
   Timer3.setCaptureCompare( PWM6_CHANNEL, tim3PwmPulse[1] );
 
-//  Timer3.attachInterrupt( timer5OverFlowCB );
+  // timer interrup start and timer start.
+//  Timer5.attachInterrupt( timer5OverFlowCB );
+//  Timer3.attachInterrupt( timer3OverFlowCB );
+  Timer5.resume(); // Resume counter and all output channels
   Timer3.resume(); // Resume counter and all output channels
+
+  // current output trimming.
+//  trimming();
 
   // SPI connected with w5500 initialize.
   SPI.setMISO( SPI2_MISO );
@@ -352,7 +356,7 @@ void loop()
 
     currentSetupTimer = 0xFFFFFFFF;
     currentHoldTimer = millis() + CURRENT_HOLD_PERIOD;
-Serial1.println( "CURRENT turn ON." );
+    Serial1.println( "CURRENT turn ON." );
   }
 
   if( currentOutput && (millis() >= currentHoldTimer) )
@@ -374,7 +378,7 @@ Serial1.println( "CURRENT turn ON." );
     TIM3->CCR2 = (uint16_t)gainAndOffset[5].zero;
 #endif
     currentHoldTimer = 0xFFFFFFFF;
-Serial1.println( "CURRENT turn OFF." );
+    Serial1.println( "CURRENT turn OFF." );
   }
 
   /* trigger output control. */
@@ -661,22 +665,74 @@ void SystemClock_Config(void)
   }
 }
 
-/* interrupt handlers. */
+/*
+  interrupt handlers.
+*/
+int tim5pwmCount = 0;
 void timer5OverFlowCB( void )
 {
-#if 0
-    count++;
-    if( (count % COUNT_LIMIT) == COUNT_CENTER )  // lower side
-    {
-      TIM5->CCR1 = (uint16_t)((tim5Scale * 20UL) / 20UL);
-    }
-    else if( (count % COUNT_LIMIT) == COUNT_UPPER )  // upper side
-    {
-      TIM5->CCR1 = (uint16_t)((tim5Scale * 0UL) / 20UL);
-    }
-#endif
+  tim5pwmCount++;
 }
 
+int tim3pwmCount = 0;
+void timer3OverFlowCB( void )
+{
+  tim3pwmCount++;
+}
+
+/*
+  offset and gain trimming.
+*/
+void trimming()
+{
+  while( 1 )
+  {
+    Timer5.setCaptureCompare( PWM1_CHANNEL, gainAndOffset[0].plus );
+    Timer5.setCaptureCompare( PWM2_CHANNEL, gainAndOffset[1].plus );
+    Timer5.setCaptureCompare( PWM3_CHANNEL, gainAndOffset[2].plus );
+    Timer5.setCaptureCompare( PWM4_CHANNEL, gainAndOffset[3].plus );
+    Timer3.setCaptureCompare( PWM5_CHANNEL, gainAndOffset[4].plus );
+    Timer3.setCaptureCompare( PWM6_CHANNEL, gainAndOffset[5].plus );
+    Serial1.println( "UPPER current." );
+    Serial1.printf( "    PWM1.%d\n", gainAndOffset[0].plus );
+    Serial1.printf( "    PWM2.%d\n", gainAndOffset[1].plus );
+    Serial1.printf( "    PWM3.%d\n", gainAndOffset[2].plus );
+    Serial1.printf( "    PWM4.%d\n", gainAndOffset[3].plus );
+    Serial1.printf( "    PWM5.%d\n", gainAndOffset[4].plus );
+    Serial1.printf( "    PWM6.%d\n", gainAndOffset[4].plus );
+    delay( 5 * 1000UL );
+
+    Timer5.setCaptureCompare( PWM1_CHANNEL, gainAndOffset[0].zero );
+    Timer5.setCaptureCompare( PWM2_CHANNEL, gainAndOffset[1].zero );
+    Timer5.setCaptureCompare( PWM3_CHANNEL, gainAndOffset[2].zero );
+    Timer5.setCaptureCompare( PWM4_CHANNEL, gainAndOffset[3].zero );
+    Timer3.setCaptureCompare( PWM5_CHANNEL, gainAndOffset[4].zero );
+    Timer3.setCaptureCompare( PWM6_CHANNEL, gainAndOffset[5].zero );
+    Serial1.println( "ZERO current." );
+    Serial1.printf( "    PWM1.%d\n", gainAndOffset[0].zero );
+    Serial1.printf( "    PWM2.%d\n", gainAndOffset[1].zero );
+    Serial1.printf( "    PWM3.%d\n", gainAndOffset[2].zero );
+    Serial1.printf( "    PWM4.%d\n", gainAndOffset[3].zero );
+    Serial1.printf( "    PWM5.%d\n", gainAndOffset[4].zero );
+    Serial1.printf( "    PWM6.%d\n", gainAndOffset[4].zero );
+    delay( 5 * 1000UL );
+
+    Timer5.setCaptureCompare( PWM1_CHANNEL, gainAndOffset[0].minus );
+    Timer5.setCaptureCompare( PWM2_CHANNEL, gainAndOffset[1].minus );
+    Timer5.setCaptureCompare( PWM3_CHANNEL, gainAndOffset[2].minus );
+    Timer5.setCaptureCompare( PWM4_CHANNEL, gainAndOffset[3].minus );
+    Timer3.setCaptureCompare( PWM5_CHANNEL, gainAndOffset[4].minus );
+    Timer3.setCaptureCompare( PWM6_CHANNEL, gainAndOffset[5].minus );
+    Serial1.println( "LOWER current." );
+    Serial1.printf( "    PWM1.%d\n", gainAndOffset[0].minus );
+    Serial1.printf( "    PWM2.%d\n", gainAndOffset[1].minus );
+    Serial1.printf( "    PWM3.%d\n", gainAndOffset[2].minus );
+    Serial1.printf( "    PWM4.%d\n", gainAndOffset[3].minus );
+    Serial1.printf( "    PWM5.%d\n", gainAndOffset[4].minus );
+    Serial1.printf( "    PWM6.%d\n", gainAndOffset[4].minus );
+    delay( 5 * 1000UL );
+  }
+}
 
 extern "C"
 {
