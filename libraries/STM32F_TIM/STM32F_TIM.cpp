@@ -122,7 +122,6 @@ void STM32F_TIM::configDMA( uint32_t _mode, uint8_t pri, uint8_t sub )
  */
 void STM32F_TIM::startDMA()
 {
-  int index = channel2Index();
   HAL_DMA_Start( &h_dma, (uint32_t)src, (uint32_t)DMA_RESOURCE[ index ].ccrx, elementSize );
   enaTimChDMA();
 }
@@ -132,7 +131,6 @@ void STM32F_TIM::startDMA()
  */
 void STM32F_TIM::abortDMA()
 {
-  int index = channel2Index();
   disTimChDMA();
   HAL_DMA_Abort( &h_dma );
 }
