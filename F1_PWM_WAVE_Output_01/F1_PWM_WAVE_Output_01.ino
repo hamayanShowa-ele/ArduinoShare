@@ -9,6 +9,7 @@
 #define  PWM6_PIN   PC7
 #define  PWM7_PIN   PC8
 #define  PWM8_PIN   PC9
+
 #define  PD7_PORT   GPIOD
 #define  PD7_PIN    GPIO_PIN_7
 
@@ -67,7 +68,7 @@ void setup()
   /* PWM5 initialize. */
   pwm5.begin( &Timer3, PWM5_CHANNEL, PWM5_PIN, overFlow / 2 );
   pwm5.setScaleAndOffset( overFlow, overFlow / 2, overFlow / 2 );
-  Serial1.printf( "pwm5 limit = %d scale = %d offset = %d.\n", pwm5.limit, pwm5.scale, pwm5.offset );
+  Serial1.printf( "pwm5 limit = %d scale = %d offset = %d.\n", pwm5.getLimit(), pwm5.getScale(), pwm5.getOffset() );
   pwm5.configDMA();
   pwm5.setSource( pwm_table, PWM_ELEMENTS );
   pwm5.startDMA();
@@ -75,7 +76,7 @@ void setup()
   /* PWM7 initialize. */
   pwm7.begin( &Timer3, PWM7_CHANNEL, PWM7_PIN, overFlow / 2 );
   pwm7.setScaleAndOffset( overFlow, overFlow / 2, overFlow / 2 );
-  Serial1.printf( "pwm7 limit = %d scale = %d offset = %d.\n", pwm7.limit, pwm7.scale, pwm7.offset );
+  Serial1.printf( "pwm7 limit = %d scale = %d offset = %d.\n", pwm7.getLimit(), pwm7.getScale(), pwm7.getOffset() );
   pwm7.configDMA();
   pwm7.setSource( pwm_table, PWM_ELEMENTS );
   pwm7.startDMA();
@@ -83,7 +84,7 @@ void setup()
   /* PWM8 initialize. */
   pwm8.begin( &Timer3, PWM8_CHANNEL, PWM8_PIN, overFlow / 2 );
   pwm8.setScaleAndOffset( overFlow, overFlow / 2, overFlow / 2 );
-  Serial1.printf( "pwm8 limit = %d scale = %d offset = %d.\n", pwm8.limit, pwm8.scale, pwm8.offset );
+  Serial1.printf( "pwm8 limit = %d scale = %d offset = %d.\n", pwm8.getLimit(), pwm8.getScale(), pwm8.getOffset() );
   pwm8.configDMA();
   pwm8.setSource( pwm_table, PWM_ELEMENTS );
   pwm8.startDMA();
