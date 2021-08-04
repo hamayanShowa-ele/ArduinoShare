@@ -13,7 +13,7 @@
   Blynk library is licensed under MIT license
   This example code is in public domain.
  *************************************************************
-  You’ll need:
+  You ??? need:
    - Blynk App (download from AppStore or Google Play)
    - Arduino Uno board
    - Decide how to connect to Blynk
