@@ -183,7 +183,7 @@ void setup()
   delay( 500UL );
 
   // SPI connected with w5500 initialize.
-  wizchip.setPclk( cpu_id.pclk2() );
+  wizchip.setPclk( cpu_id.pclk1() );
   SPI.setMISO( SPI2_MISO );
   SPI.setMOSI( SPI2_MOSI );
   SPI.setSCLK( SPI2_SCK );
