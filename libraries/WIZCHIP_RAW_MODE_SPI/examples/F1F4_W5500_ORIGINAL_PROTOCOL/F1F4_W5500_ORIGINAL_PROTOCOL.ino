@@ -7,9 +7,9 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <Ethernet2.h>
-#include <rom24aa025.h>
-#include <STM32F_CPU_Identity.h>
-#include <WIZCHIP_RAW_MODE_SPI.h>
+#include <rom24aa025.h>  // https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/rom24aa025
+#include <STM32F_CPU_Identity.h>  // https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/STM32F_CPU_Identity
+#include <WIZCHIP_RAW_MODE_SPI.h>  // https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/WIZCHIP_RAW_MODE_SPI
 
 /*
   Board types.
