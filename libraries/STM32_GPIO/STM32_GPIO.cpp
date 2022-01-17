@@ -2,6 +2,9 @@
   ******************************************************************************
   * @file           : STM32_GPIO.cpp
   * @brief          : STM32_GPIO code
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
   */
 /* Includes ------------------------------------------------------------------*/
 #include "STM32_GPIO.h"
@@ -100,5 +103,3 @@ uint32_t getGPIO_PINx( uint32_t p )
 }
 
 }  /* extern "C" */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
