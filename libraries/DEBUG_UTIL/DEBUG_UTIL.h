@@ -2,6 +2,10 @@
   ******************************************************************************
   * @file           : DEBUG_UTIL.h
   * @brief          : DEBUG_UTIL header
+
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
   ******************************************************************************
   */
 #ifndef  __DEBUG_UTIL_H__
