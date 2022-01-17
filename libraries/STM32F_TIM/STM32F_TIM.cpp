@@ -1,7 +1,9 @@
 /*
   STM32F TImer extention librarly.
 
-  Copyright (C) 2014 hamayan All Rights Reserved.
+  Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
 */
 
 #include  <STM32F_TIM.h>
@@ -202,7 +204,3 @@ void disTimChannelDMA( TIM_TypeDef *TIMx, int ch )
 }
 
 }  /* extern "C" */
-
-/*
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
