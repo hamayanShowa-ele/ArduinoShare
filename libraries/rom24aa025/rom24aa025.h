@@ -1,6 +1,13 @@
-/*
-  SERIAL EEPROM 24AA025 librarly.
-*/
+/**
+  ******************************************************************************
+  * @file           : rom24aa025.h
+  * @brief          : SERIAL EEPROM 24AA025 librarly.
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */
+
 #ifndef  __EEPROM_24AA025__
 #define  __EEPROM_24AA025__
 
@@ -29,7 +36,3 @@ public:
 
  
 #endif  /*  __EEPROM_24AA025__ */
-
-/*
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
