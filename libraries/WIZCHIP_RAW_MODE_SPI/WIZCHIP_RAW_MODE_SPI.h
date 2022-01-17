@@ -1,8 +1,13 @@
-/*
-  W5500 RAW MODE librarly.
+/**
+  ******************************************************************************
+  * @file           : WIZCHIP_RAW_MODE_SPI.h
+  * @brief          : W5500 RAW MODE librarly.
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */
 
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
 #ifndef  __WIZCHIP_RAW_MODE_SPI_H__
 #define  __WIZCHIP_RAW_MODE_SPI_H__
 
@@ -553,7 +558,3 @@ public :
 };
 
 #endif  /*  __WIZCHIP_RAW_MODE_SPI_H__ */
-
-/*
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
