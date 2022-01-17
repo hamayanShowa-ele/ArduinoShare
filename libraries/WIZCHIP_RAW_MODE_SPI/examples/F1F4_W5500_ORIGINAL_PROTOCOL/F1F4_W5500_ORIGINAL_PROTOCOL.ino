@@ -1,8 +1,12 @@
-/*
-  W5500 RAW MODE librarly test code.
-
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
+/**
+  ******************************************************************************
+  * @file           : F1F4_W5500_ORIGINAL_PROTOCOL.ino
+  * @brief          : W5500 RAW MODE librarly test code.
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */
 
 #include <SPI.h>
 #include <Wire.h>
