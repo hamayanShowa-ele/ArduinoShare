@@ -1,8 +1,11 @@
 /*
   STM32F TImer extention librarly.
 
-  Copyright (C) 2014 hamayan All Rights Reserved.
+  Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
 */
+
 #ifndef  __STM32F_TIM__
 #define  __STM32F_TIM__
 
@@ -245,7 +248,3 @@ public:
 
 
 #endif  /*  __STM32F_TIM__ */
-
-/*
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
