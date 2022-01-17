@@ -2,6 +2,9 @@
   ******************************************************************************
   * @file           : STM32_GPIO.h
   * @brief          : GPIO header
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
   ******************************************************************************
   */
 #ifndef  __STM32x_GPIO_H__
@@ -40,5 +43,3 @@ uint32_t getGPIO_PINx( uint32_t p );
 #endif
 
 #endif  /* __STM32x_GPIO_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
