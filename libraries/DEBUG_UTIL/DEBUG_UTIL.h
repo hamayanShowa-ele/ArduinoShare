@@ -33,5 +33,3 @@ uint32_t memCheck( uint16_t *dat, uint32_t size );
 uint32_t memCheck( uint32_t *dat, uint32_t size );
 
 #endif  /* __DEBUG_UTIL_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
