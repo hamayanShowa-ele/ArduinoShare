@@ -2,6 +2,9 @@
   ******************************************************************************
   * @file           : DEBUG_UTIL.cpp
   * @brief          : DEBUG_UTIL code
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
   */
 /* Includes ------------------------------------------------------------------*/
 #include "DEBUG_UTIL.h"
@@ -173,5 +176,3 @@ uint32_t memCheck( uint32_t *dat, uint32_t size )
   }
   return result;
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
