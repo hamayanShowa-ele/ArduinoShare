@@ -1,8 +1,12 @@
-/*
-  W5500 RAW MODE librarly.
-
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
+/**
+  ******************************************************************************
+  * @file           : WIZCHIP_RAW_MODE_SPI.cpp
+  * @brief          : W5500 RAW MODE librarly.
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */
 
 #include  <WIZCHIP_RAW_MODE_SPI.h>
 
@@ -462,7 +466,7 @@ extern "C"
 #define CRCPOLY1 0x04C11DB7UL
     /* x^{32}+x^{26}+x^{23}+x^{22}+x^{16}+x^{12}+x^{11]+
        x^{10}+x^8+x^7+x^5+x^4+x^2+x^1+1 */
-#define CRCPOLY2 0xEDB88320UL  /* ×óÓÒÄæÜž */
+#define CRCPOLY2 0xEDB88320UL  /* Ã—Ã³Ã“Ã’Ã„Ã¦ÃœÂž */
 
 uint32_t crc32Left( int n, uint8_t c[] )  // left shifted.
 {
@@ -495,7 +499,3 @@ uint32_t crc32Right( int n, uint8_t c[] )  // right shifted.
 }
 
 }  /* extern "C" */
-
-/*
-  Copyright (C) 2014 hamayan All Rights Reserved.
-*/
