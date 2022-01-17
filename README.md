@@ -8,3 +8,5 @@ Arduino sketch and library share.
 #STM32 #GPIO
 
 2022/01/17 Add libraries related to EXTI for STM32 microcontrollers to the library folder. #EXTI
+
+2022/01/17 Added utilities to the library folder to be used when debugging.  ＃DEBUG
