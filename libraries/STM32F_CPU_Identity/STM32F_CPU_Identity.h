@@ -1,7 +1,11 @@
 /*
   STM32Fxxx CPU Identity
-    Copyright (C) 2014 hamayan All Rights Reserved.
+
+  Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
 */
+
 #ifndef __STM32F_CPU_IDENTITY_H__
 #define __STM32F_CPU_IDENTITY_H__
 
@@ -57,10 +61,4 @@ public:
   }
 };
 
-
 #endif  /* __STM32Fxxx_CPU_IDENTITY_H__ */
-
-/*
-  STM32Fxxx CPU Identity
-    Copyright (C) 2014 hamayan All Rights Reserved.
-*/
