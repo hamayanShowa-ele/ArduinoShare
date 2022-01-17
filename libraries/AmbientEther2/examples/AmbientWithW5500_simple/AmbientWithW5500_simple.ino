@@ -1,5 +1,8 @@
 /*
  * Send something to Ambient.
+ * Copyright (c) 2022 Kazuaki Hamahara
+ *  Released under the MIT license
+ *  https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
  */
 
 #include <SPI.h>
