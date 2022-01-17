@@ -1,5 +1,8 @@
 /*
   STM32F407ZET named virgo fsmc test
+  Copyright (c) 2013 Kazuaki Hamahara
+  This source code is released under the MIT license, but there are some different licenses.
+  https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
 */
 
 /* Includes ------------------------------------------------------------------*/
@@ -125,6 +128,17 @@ void loop()
 /**
   * @brief System Clock Configuration
   * @retval None
+  * @attention
+  * Be sure to refer to this site to make changes to stm32yyxx_hal_conf.h.
+  * https://www.stm32duino.com/viewtopic.php?p=8819
+  * 
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   */
 void SystemClock_Config(void)
 {
