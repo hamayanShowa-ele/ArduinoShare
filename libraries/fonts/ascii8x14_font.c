@@ -1,8 +1,12 @@
-/* ------------------------------------------------------------------------ */
-/* 画像データテーブル                                                       */
-/*                                          designed by hamayan             */
-/*                                          Copyright (C) 2003 - by hamayan */
-/* ------------------------------------------------------------------------ */
+/**
+  ******************************************************************************
+  * @file           : ascii8x14_font.c
+  * @brief          : ascii 8 width and 14 height font.
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */
 
 /*	Graphic Info*/
 /*	Type:BM*/
@@ -57,8 +61,3 @@ const unsigned char ASCII8x14_GraphicBMPTable[] =
 /*	                         *  *     *                                  *   *                        *                     *                                                                                                 *                                                                                                                                                                                                                                                                 ***           ***            *******                                                                                  **                                              *           *                                                           *                 **     *       **           */
 /*	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   *                    */
 
-/* ------------------------------------------------------------------------ */
-/* end of file                                                              */
-/*                                          designed by hamayan             */
-/*                                          Copyright (C) 2003 - by hamayan */
-/* ------------------------------------------------------------------------ */
