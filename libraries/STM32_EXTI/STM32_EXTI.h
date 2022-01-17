@@ -2,6 +2,9 @@
   ******************************************************************************
   * @file           : STM32_EXTI.h
   * @brief          : EXTI header
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
   ******************************************************************************
   */
 #ifndef  __STM32x_EXTI_H__
@@ -33,5 +36,3 @@ void attachEXTI( uint32_t pin, void (*cb)(void), uint32_t md );
 void detachEXTI( uint32_t pin );
 
 #endif  /* __STM32x_EXTI_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
