@@ -2,6 +2,8 @@
   ******************************************************************************
   * @file           : STM32_FSMC.h
   * @brief          : fsmc header
+    Copyright (c) 2022 Kazuaki Hamahara
+    This source code retains the following license.
   ******************************************************************************
   * @attention
   * Be sure to refer to this site to make changes to stm32yyxx_hal_conf.h.
@@ -48,5 +50,3 @@ void fsmc_sram(
 #endif
 
 #endif  /* __STM32Fx_FSMC_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
