@@ -176,3 +176,15 @@ uint32_t memCheck( uint32_t *dat, uint32_t size )
   }
   return result;
 }
+
+/*
+  blink led infinity loop.
+*/
+void IamStuck( uint32_t dly )
+{
+  while( true )
+  {
+    delay( dly );
+    digitalWrite( LED_BUILTIN, (digitalRead( LED_BUILTIN ) == HIGH) ? LOW : HIGH );
+  }
+}

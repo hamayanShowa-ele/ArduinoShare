@@ -31,5 +31,6 @@ void dump( const uint32_t *dat, int size );
 uint32_t memCheck( uint8_t *dat, uint32_t size );
 uint32_t memCheck( uint16_t *dat, uint32_t size );
 uint32_t memCheck( uint32_t *dat, uint32_t size );
+void IamStuck( uint32_t dly );
 
 #endif  /* __DEBUG_UTIL_H__ */
