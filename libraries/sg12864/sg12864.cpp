@@ -1,8 +1,13 @@
-﻿/*
-  Low cost graphic LCD SG12864 codes
-    Copyright (C) 2014 hamayan All Rights Reserved.
-                       hamayan.contact@gmail.com
-*/
+/**
+  ******************************************************************************
+  * @file           : sg12864.cpp
+  * @brief          : Low cost graphic LCD SG12864 header
+    Copyright (c) 2022 Kazuaki Hamahara
+    Released under the MIT license
+    https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
+  */﻿
+
 #include  "sg12864.h"
 
 extern "C"{
