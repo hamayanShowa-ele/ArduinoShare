@@ -1,11 +1,14 @@
 /**
   ******************************************************************************
   * @file           : DEBUG_UTIL.cpp
-  * @brief          : DEBUG_UTIL code
+  * @brief          : DEBUG_UTIL header
+
     Copyright (c) 2022 Kazuaki Hamahara
     Released under the MIT license
     https://github.com/YukinobuKurata/YouTubeMagicBuyButton/blob/master/MIT-LICENSE.txt
+  ******************************************************************************
   */
+
 /* Includes ------------------------------------------------------------------*/
 #include "DEBUG_UTIL.h"
 
@@ -185,6 +188,6 @@ void IamStuck( uint32_t dly )
   while( true )
   {
     delay( dly );
-    digitalWrite( LED_BUILTIN, (digitalRead( LED_BUILTIN ) == HIGH) ? LOW : HIGH );
+    LED_BUILTIN_TOGGLE();
   }
 }

@@ -25,6 +25,9 @@ extern "C" {
 }
 #endif
 
+#define  LED_TOGGLE(pin)  do{digitalWrite(pin,(digitalRead(pin) == HIGH) ? LOW : HIGH);}while(0)
+#define  LED_BUILTIN_TOGGLE()  LED_TOGGLE(LED_BUILTIN)
+
 void dump( const uint8_t *dat, int size );
 void dump( const uint16_t *dat, int size );
 void dump( const uint32_t *dat, int size );
