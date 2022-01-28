@@ -20,7 +20,7 @@ extern "C"
   * @brief memory dump program
   * @retval none.
   */
-void dump( const uint8_t *dat, int size )
+void dump( const uint8_t *dat, int size, HardwareSerial *seri )
 {
   if( size % 16 ) { size = size / 16; size++; size *= 16; }
   for( int i = 0; i < size; i += 16 )
@@ -48,12 +48,14 @@ void dump( const uint8_t *dat, int size )
       line += buf;
       dat++;
     }
-    Serial.println( line );
+    if( seri == nullptr ) { Serial.println( line ); }
+    else { seri->println( line ); }
   }
-  Serial.println();
+  if( seri == nullptr ) { Serial.println(); }
+  else { seri->println(); }
 }
 
-void dump( const uint16_t *dat, int size )
+void dump( const uint16_t *dat, int size, HardwareSerial *seri )
 {
   if( size % 16 ) { size = size / 16; size++; size *= 16; }
   size /= 2;
@@ -68,12 +70,14 @@ void dump( const uint16_t *dat, int size )
       sprintf( buf, "%04X,", *dat++ );
       line += buf;
     }
-    Serial.println( line );
+    if( seri == nullptr ) { Serial.println( line ); }
+    else { seri->println( line ); }
   }
-  Serial.println();
+  if( seri == nullptr ) { Serial.println(); }
+  else { seri->println(); }
 }
 
-void dump( const uint32_t *dat, int size )
+void dump( const uint32_t *dat, int size, HardwareSerial *seri )
 {
   if( size % 16 ) { size = size / 16; size++; size *= 16; }
   size /= 4;
@@ -88,9 +92,11 @@ void dump( const uint32_t *dat, int size )
       sprintf( buf, "%08X,", *dat++ );
       line += buf;
     }
-    Serial.println( line );
+    if( seri == nullptr ) { Serial.println( line ); }
+    else { seri->println( line ); }
   }
-  Serial.println();
+  if( seri == nullptr ) { Serial.println(); }
+  else { seri->println(); }
 }
 
 /**

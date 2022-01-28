@@ -28,9 +28,9 @@ extern "C" {
 #define  LED_TOGGLE(pin)  do{digitalWrite(pin,(digitalRead(pin) == HIGH) ? LOW : HIGH);}while(0)
 #define  LED_BUILTIN_TOGGLE()  LED_TOGGLE(LED_BUILTIN)
 
-void dump( const uint8_t *dat, int size );
-void dump( const uint16_t *dat, int size );
-void dump( const uint32_t *dat, int size );
+void dump( const uint8_t *dat, int size, HardwareSerial *seri = nullptr );
+void dump( const uint16_t *dat, int size, HardwareSerial *seri = nullptr );
+void dump( const uint32_t *dat, int size, HardwareSerial *seri = nullptr );
 uint32_t memCheck( uint8_t *dat, uint32_t size );
 uint32_t memCheck( uint16_t *dat, uint32_t size );
 uint32_t memCheck( uint32_t *dat, uint32_t size );
