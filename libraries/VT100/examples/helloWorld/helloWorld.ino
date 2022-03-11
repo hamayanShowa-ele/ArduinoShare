@@ -40,6 +40,19 @@ void setup()
   vt100.cr();
   vt100.lf();
   vt100.undo();
+
+  Serial.println( "Extended mode output." );
+  for( int i = 0; i < 16; i++ )
+  {
+    for( int j = 0; j < 16; j++ )
+    {
+      vt100.extend( i * 16 + j );
+      Serial.print( i * 16 + j, DEC );
+      Serial.print( " " );
+    }
+    Serial.println();
+  }
+  vt100.defaultColor();
 }
 
 /**

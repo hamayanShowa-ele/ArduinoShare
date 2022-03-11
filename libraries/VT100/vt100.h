@@ -60,16 +60,16 @@ public:
     if( x != 0 )
     {
       String esc = "\x1b[";
-      if( x > 0 ) { esc += (String)x; esc += "C"; }
-      else { esc += (String)abs(x); esc += "D"; }
+      if( x > 0 ) { esc += String(x,DEC); esc += "C"; }
+      else { esc += String( abs(x), DEC ); esc += "D"; }
       write( (const char *)esc.c_str() );
     }
     // y position.
     if( y != 0 )
     {
       String esc = "\x1b[";
-      if( y > 0 ) { esc += (String)y; esc += "B"; }
-      else { esc += (String)abs(y); esc += "A"; }
+      if( y > 0 ) { esc += String(y,DEC); esc += "B"; }
+      else { esc += String( abs(y), DEC ); esc += "A"; }
       write( (const char *)esc.c_str() );
     }
   }
@@ -79,8 +79,8 @@ public:
     if( y != 0 )
     {
       String esc = "\x1b[";
-      if( y > 0 ) { esc += (String)y; esc += "E"; }
-      else { esc += (String)abs(y); esc += "F"; }
+      if( y > 0 ) { esc += String(y,DEC); esc += "E"; }
+      else { esc += String( abs(y), DEC ); esc += "F"; }
       write( (const char *)esc.c_str() );
     }
   }
@@ -90,8 +90,8 @@ public:
     if( y != 0 )
     {
       String esc = "\x1b[";
-      if( y > 0 ) { esc += (String)y; esc += "S"; }
-      else { esc += (String)abs(y); esc += "T"; }
+      if( y > 0 ) { esc += String(y,DEC); esc += "S"; }
+      else { esc += String( abs(y), DEC ); esc += "T"; }
       write( (const char *)esc.c_str() );
     }
   }
@@ -99,20 +99,32 @@ public:
   void absY( int y )  // Move the cursor to a location y from the left edge, regardless of the current horizontal position.
   {
     if( y < 0 ) return;
-    String esc = "\x1b[" + (String)y + "G";
+    String esc = "\x1b[" + String(y,DEC) + "G";
     write( (const char *)esc.c_str() );
   }
 
   void absCur( int x, int y )  // Move the cursor to the absolute position.
   {
     if( x < 0 || y < 0 ) return;
-    String esc = "\x1b[" + (String)x + ";" + (String)y + "H";
+    String esc = "\x1b[" + String(x,DEC) + ";" + String(y,DEC) + "H";
     write( (const char *)esc.c_str() );
   }
 
   void attributes( int code )
   {
-    String esc = "\x1b[" + (String)code + "m";
+    String esc = "\x1b[" + String(code,DEC) + "m";
+    write( (const char *)esc.c_str() );
+  }
+
+  void extend( uint8_t code )
+  {
+    String esc = "\x1b[38;5;" + String(code,DEC) + "m";
+    write( (const char *)esc.c_str() );
+  }
+
+  void bgExtend( uint8_t code )
+  {
+    String esc = "\x1b[48;5;" + String(code,DEC) + "m";
     write( (const char *)esc.c_str() );
   }
 
