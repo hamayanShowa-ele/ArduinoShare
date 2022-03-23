@@ -59,6 +59,9 @@ public:
   {
     HAL_RCC_GetClockConfig( RCC_ClkInitStruct, pFLatency );
   }
+  
+  String sysClockString();
+  String uIDtring();
 };
 
 #endif  /* __STM32Fxxx_CPU_IDENTITY_H__ */
