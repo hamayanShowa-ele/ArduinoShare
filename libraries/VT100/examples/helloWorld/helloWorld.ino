@@ -2,13 +2,14 @@
   VT100 example.
 */
 
-#include  <vt100.h>
+//#include  <vt100.h>
+#include  <vt100_hardware_serial.h>
 
 /**
   * @brief instance and global variables.
   */
 
-VT100 vt100( &Serial );  // When using Serial, no arguments need to be set.
+VT100_HARDWARE_SERIAL vt100( &Serial );  // When using Serial, no arguments need to be set.
 
 /**
   * @brief setup.
@@ -18,6 +19,7 @@ void setup()
 {
   Serial.begin( 115200UL );
   while( !Serial ) { delay( 20UL ); }
+//  VT100_HARDWARE_SERIAL *vt100 = new VT100_HARDWARE_SERIAL( &Serial );  // When using Serial, no arguments need to be set.
   for( int i = 0; i < 3; i++ ) { vt100.beep(); delay( 500 ); }
   vt100.cls();
   vt100.home();

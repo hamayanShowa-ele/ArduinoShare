@@ -7,8 +7,6 @@
 #define  __vt100_h__
 
 #include  <Arduino.h>
-#include  <HardwareSerial.h>
-
 extern "C"
 {
 }
@@ -27,34 +25,16 @@ extern "C"
 class VT100
 {
 private:
-  HardwareSerial *serial;
-  void write( const char *str )
-  {
-    while( *str ) { serial->write( *str++ ); }
-  }
-
 public:
-  VT100() { serial = &Serial; }
-  VT100( HardwareSerial *s ) { serial = s; }
+  String home() { return "\x1b[0;0H"; }  // cursor home.
+  String cls() { return "\x1b[2J"; }  // clear screen.
+  String delScrBack() { return "\x1b[0J"; }  // Erase behind the cursor.
+  String delScrFront() { return "\x1b[1J"; }  // Erase before the cursor.
+  String delLine() { return "\x1b[2K"; }  // Delete cursor line.
+  String delLineBack() { return "\x1b[0K"; }  // Delete after the cursor on the cursor line.
+  String delLineFront() { return "\x1b[1K"; }  // Delete before the cursor on the cursor line.
 
-  void beep() { serial->write( ASCII_BEEP ); }  // beep
-  void bs() { serial->write( ASCII_BS ); }  // back space
-  void ff() { serial->write( ASCII_FF ); }  // front feed
-  void lf() { serial->write( ASCII_LF ); }  // line feed
-  void cr() { serial->write( ASCII_CR ); }  // carriage return
-  void htab() { serial->write( ASCII_HTAB ); }  // horizontal tabulation
-  void vtab() { serial->write( ASCII_VTAB ); }  // vertical tabulation
-  void del() { serial->write( ASCII_SPACE ); }  // delete
-
-  void home() { write( "\x1b[0;0H" ); }  // cursor home.
-  void cls() { write( "\x1b[2J" ); }  // clear screen.
-  void delScrBack() { write( "\x1b[0J" ); }  // Erase behind the cursor.
-  void delScrFront() { write( "\x1b[1J" ); }  // Erase before the cursor.
-  void delLine() { write( "\x1b[2K" ); }  // Delete cursor line.
-  void delLineBack() { write( "\x1b[0K" ); }  // Delete after the cursor on the cursor line.
-  void delLineFront() { write( "\x1b[1K" ); }  // Delete before the cursor on the cursor line.
-
-  void relCur( int x, int y )  // Move the cursor to a relative position.
+  String relCur( int x, int y )  // Move the cursor to a relative position.
   {
     // x position.
     if( x != 0 )
@@ -62,7 +42,7 @@ public:
       String esc = "\x1b[";
       if( x > 0 ) { esc += String(x,DEC); esc += "C"; }
       else { esc += String( abs(x), DEC ); esc += "D"; }
-      write( (const char *)esc.c_str() );
+      return esc;
     }
     // y position.
     if( y != 0 )
@@ -70,93 +50,93 @@ public:
       String esc = "\x1b[";
       if( y > 0 ) { esc += String(y,DEC); esc += "B"; }
       else { esc += String( abs(y), DEC ); esc += "A"; }
-      write( (const char *)esc.c_str() );
+      return esc;
     }
   }
 
-  void relY_Top( int y )  // Moves the cursor to the beginning of the line at the specified relative position.
+  String relY_Top( int y )  // Moves the cursor to the beginning of the line at the specified relative position.
   {
     if( y != 0 )
     {
       String esc = "\x1b[";
       if( y > 0 ) { esc += String(y,DEC); esc += "E"; }
       else { esc += String( abs(y), DEC ); esc += "F"; }
-      write( (const char *)esc.c_str() );
+      return esc;
     }
   }
 
-  void relCurMove( int y )  // Scroll the console to the next y lines.
+  String relCurMove( int y )  // Scroll the console to the next y lines.
   {
     if( y != 0 )
     {
       String esc = "\x1b[";
       if( y > 0 ) { esc += String(y,DEC); esc += "S"; }
       else { esc += String( abs(y), DEC ); esc += "T"; }
-      write( (const char *)esc.c_str() );
+      return esc;
     }
   }
 
-  void absY( int y )  // Move the cursor to a location y from the left edge, regardless of the current horizontal position.
+  String absY( int y )  // Move the cursor to a location y from the left edge, regardless of the current horizontal position.
   {
-    if( y < 0 ) return;
+    if( y < 0 ) return "";
     String esc = "\x1b[" + String(y,DEC) + "G";
-    write( (const char *)esc.c_str() );
+    return esc;
   }
 
-  void absCur( int x, int y )  // Move the cursor to the absolute position.
+  String absCur( int x, int y )  // Move the cursor to the absolute position.
   {
-    if( x < 0 || y < 0 ) return;
+    if( x < 0 || y < 0 ) return "";
     String esc = "\x1b[" + String(x,DEC) + ";" + String(y,DEC) + "H";
-    write( (const char *)esc.c_str() );
+    return esc;
   }
 
-  void attributes( int code )
+  String attributes( int code )
   {
     String esc = "\x1b[" + String(code,DEC) + "m";
-    write( (const char *)esc.c_str() );
+    return esc;
   }
 
-  void extend( uint8_t code )
+  String extend( uint8_t code )
   {
     String esc = "\x1b[38;5;" + String(code,DEC) + "m";
-    write( (const char *)esc.c_str() );
+    return esc;
   }
 
-  void bgExtend( uint8_t code )
+  String bgExtend( uint8_t code )
   {
     String esc = "\x1b[48;5;" + String(code,DEC) + "m";
-    write( (const char *)esc.c_str() );
+    return esc;
   }
 
-  void undo() { attributes( 0 ); }  // Undo Character Attributes.
-  void bold() { attributes( 1 ); }  // Bold text attributes.
-  void dark() { attributes( 2 ); }  // Darken character attributes.
-  void italic() { attributes( 3 ); }  // Italicize the character attributes.
-  void under() { attributes( 4 ); }  // Underlining.
-  void blink() { attributes( 5 ); }  // blinking.
-  void reversal() { attributes( 7 ); }  // reversal.
-  void hidden() { attributes( 8 ); }  // hidden.
-  void cancel() { attributes( 9 ); }  // cancel.
+  String undo() { return attributes( 0 ); }  // Undo Character Attributes.
+  String bold() { return attributes( 1 ); }  // Bold text attributes.
+  String dark() { return attributes( 2 ); }  // Darken character attributes.
+  String italic() { return attributes( 3 ); }  // Italicize the character attributes.
+  String under() { return attributes( 4 ); }  // Underlining.
+  String blink() { return attributes( 5 ); }  // blinking.
+  String reversal() { return attributes( 7 ); }  // reversal.
+  String hidden() { return attributes( 8 ); }  // hidden.
+  String cancel() { return attributes( 9 ); }  // cancel.
   // The letters in the 90s are brighter than those in the 30s.
-  void black() { attributes( 30 + 60 ); }  // Make the foreground color black.
-  void red() { attributes( 31 + 60 ); }  // Make the foreground color red.
-  void green() { attributes( 32 + 60 ); }  // Make the foreground color green.
-  void yellow() { attributes( 33 + 60 ); }  // Make the foreground color yellow.
-  void blue() { attributes( 34 + 60 ); }  // Make the foreground color blue.
-  void magenta() { attributes( 35 + 60 ); }  // Make the foreground color magenta.
-  void cyan() { attributes( 36 + 60 ); }  // Make the foreground color cyan.
-  void white() { attributes( 37 + 60 ); }  // Make the foreground color white.
-  void defaultColor() { attributes( 39 ); }  // Restore foreground color to default.
+  String black() { return attributes( 30 + 60 ); }  // Make the foreground color black.
+  String red() { return attributes( 31 + 60 ); }  // Make the foreground color red.
+  String green() { return attributes( 32 + 60 ); }  // Make the foreground color green.
+  String yellow() { return attributes( 33 + 60 ); }  // Make the foreground color yellow.
+  String blue() { return attributes( 34 + 60 ); }  // Make the foreground color blue.
+  String magenta() { return attributes( 35 + 60 ); }  // Make the foreground color magenta.
+  String cyan() { return attributes( 36 + 60 ); }  // Make the foreground color cyan.
+  String white() { return attributes( 37 + 60 ); }  // Make the foreground color white.
+  String defaultColor() { return attributes( 39 ); }  // Restore foreground color to default.
   // The background color of the 100s is lighter than that of the 40s.
-  void bgBlack() { attributes( 40 ); }  // Make the background color black.
-  void bgRed() { attributes( 41 ); }  // Make the background color red.
-  void bgGreen() { attributes( 42 ); }  // Make the background color green.
-  void bgYellow() { attributes( 43 ); }  // Make the background color yellow.
-  void bgBlue() { attributes( 44 ); }  // Make the background color blue.
-  void bgMagenta() { attributes( 45 ); }  // Make the background color magenta.
-  void bgCyan() { attributes( 46 ); }  // Make the background color cyan.
-  void bgWhite() { attributes( 47 ); }  // Make the background color white.
-  void bgDefaultColor() { attributes( 49 ); }  // Restore background color to default.
+  String bgBlack() { return attributes( 40 ); }  // Make the background color black.
+  String bgRed() { return attributes( 41 ); }  // Make the background color red.
+  String bgGreen() { return attributes( 42 ); }  // Make the background color green.
+  String bgYellow() { return attributes( 43 ); }  // Make the background color yellow.
+  String bgBlue() { return attributes( 44 ); }  // Make the background color blue.
+  String bgMagenta() { return attributes( 45 ); }  // Make the background color magenta.
+  String bgCyan() { return attributes( 46 ); }  // Make the background color cyan.
+  String bgWhite() { return attributes( 47 ); }  // Make the background color white.
+  String bgDefaultColor() { return attributes( 49 ); }  // Restore background color to default.
 };  /* VT100 */
 
 #endif  /* __vt100_h__ */
