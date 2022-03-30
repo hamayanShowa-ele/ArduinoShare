@@ -39,7 +39,8 @@ static int vMAX_TASK_NUMBER = 1;
 /* ----------------------------------------
  task control block
 ---------------------------------------- */
-TASK_CONTROL_BLOCK tcb[ TASK_END ];   // Area for saving environment variables (context) of tasks
+//TASK_CONTROL_BLOCK tcb[ TASK_END ];   // Area for saving environment variables (context) of tasks
+TASK_CONTROL_BLOCK *tcb;   // Area for saving environment variables (context) of tasks
 
 /* ----------------------------------------
  configure system
@@ -49,6 +50,7 @@ ER cfg_sys( int tskNum )
   if( tskNum > TASK_END ) return E_NOMEM;
   vMAX_TASK_NUMBER = tskNum;
 //  TASK_CONTROL_BLOCK *tcb = (TASK_CONTROL_BLOCK *)malloc( sizeof(TASK_CONTROL_BLOCK) * tskNum );
+  tcb = new TASK_CONTROL_BLOCK[vMAX_TASK_NUMBER];
   return E_OK;
 }
 
