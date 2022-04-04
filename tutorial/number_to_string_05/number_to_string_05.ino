@@ -26,7 +26,7 @@ void loop()
   static int increment_data = 0;
   delay( 1000UL );
 
-  uint8_t buffer[48];
+  uint8_t buffer[32];
   // Generate appropriate data.
   for( int i = 0; i < (int)sizeof(buffer); i++ )  { buffer[i] = (uint8_t)increment_data++; }
   // dump memory.

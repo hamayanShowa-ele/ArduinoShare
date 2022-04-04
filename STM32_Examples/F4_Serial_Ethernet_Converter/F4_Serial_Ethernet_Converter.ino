@@ -1,13 +1,21 @@
 /*
   Arduino IDE setup.
   Board type : Ncleo-64. NUCLEO-F446RE
-  U(S)ART support : Enaable (No generic Serial).
+  U(S)ART support : Enable (No generic Serial).
   USB support : CDC (generic Serial supersede U(S)ART).
   USB speed : Low/Full Speed.
   Optimize : ANY.
   C Runtime Library : ANY.
   Update method : STM32CubeProgrammer (SWD).
   Serial port : ANY.
+
+  NUCLEO-F446RE setup.
+    R34,R36 : OPEN
+    SB50 : OPEN
+    SB48,SB49,SB55 : SHORT
+
+  Configurable baud rate : 4800,9600,19200,38400,57600,
+                           115200,230400,460800,921600bps
 */
 /**
   * @brief Add the following definition to the beginning of HardwareSerial.h in advance.
@@ -161,6 +169,20 @@ static uint32_t  baudRate[6] =
   38400UL,  // 6
 };
 
+static const uint32_t configurable_baud_rate[] =
+{
+  4800UL,  // 0
+  9600UL,  // 1
+  19200UL,  // 2
+  38400UL,  // 3
+  57600UL,  // 4
+  115200UL,  // 5
+  230400UL,  // 6
+  460800UL,  // 7
+//  921600UL,  // 8
+};
+
+
 static uint8_t tsk0_stk[ 128 * 8 ];
 static uint8_t tsk1_stk[ 128 * 8 ];
 static uint8_t tsk2_stk[ 128 * 8 ];
@@ -278,11 +300,13 @@ void stackMonitor( void )
   sta_tsk( ID_server5_Task );
   sta_tsk( ID_server6_Task );
 
-  uint8_t brrBit = 3;  // deafult 115200bps
+  uint8_t brrBit = 5;  // deafult 115200bps
   uint8_t chBit = 2;  // default Serial2
   uint8_t sw4_state = 0;
   uint32_t reportTim = millis();
   uint32_t swScanTim = millis();
+  uint32_t blinkTim = millis();
+  HardwareSerial *ser;
   while( 1 )
   {
     /*stack report.*/
@@ -328,21 +352,30 @@ void stackMonitor( void )
       sw4_state |= ( digitalRead(SW_IN2) == LOW ) ? 0x01 : 0x00;
       if( (sw4_state & 0x07) == 0x03 )  // When the switch is pressed.
       {
-        uint8_t brrBitNew = brSelectorRead() >> 1;  // 9600 or 19200 or 38400 or 115200bps
-        if( brrBitNew != brrBit )  // When there is a change in baud rate.
-        {
-          brrBit = brrBitNew;
-        }
         uint8_t chBitNew = chSelectorRead();  // 1 or 2 or 3 or 4 or 5 or 6
         if( chBitNew < 1 || chBitNew > 6 ) { chBitNew = 2; }
         if( chBitNew != chBit )
         {
           chBit = chBitNew;
+          switch( chBit )
+          {
+            case 1 : ser = &Serial1; break;
+            case 3 : ser = &Serial3; break;
+            case 4 : ser = &Serial4; break;
+            case 5 : ser = &Serial5; break;
+            case 6 : ser = &Serial6; break;
+            default :
+              ser = &Serial2;
+              chBit = 2;
+              break;
+          }
         }
-        uint32_t brr =
-          (brrBit == 0) ? 9600UL : 
-          (brrBit == 1) ? 19200UL : 
-          (brrBit == 2) ? 38400UL : 115200UL;
+        uint8_t brrBitNew = brSelectorRead() >> 0;  // 9600 or 19200 or 38400 or 115200bps and any more.
+        if( brrBitNew != brrBit )  // When there is a change in baud rate.
+        {
+          brrBit = brrBitNew;
+        }
+        uint32_t brr = configurable_baud_rate[ brrBit ];
         baudRate[ chBit - 1 ] = brr;
         // text display
         oled.clearDisplay();
@@ -351,7 +384,18 @@ void stackMonitor( void )
         oledPrint( msg, 0, 8 );
         msg = "baud = " + String( brr, DEC ) + "bps.";
         oledPrint( msg, 0, 16 );
+        // Change of baud rate.
+        ser->end();
+        ser->begin( brr );
+        while( !*ser ) { dly_tsk( 5UL ); }
       }
+    }
+
+    /*led blink.*/
+    if( (millis() - blinkTim) >= 500UL )
+    {
+      blinkTim = millis();
+      digitalWrite( ACTLED, (digitalRead(ACTLED) == LOW) ? HIGH : LOW );
     }
     rot_rdq();  // round robin.
   }
@@ -382,15 +426,6 @@ void server_Task( void )
   while( 1 )
   {
     EthernetServer server( portNumber );
-    // check the new comport baud rate.
-    if( baudRate[serialNumber - 1] != baud )
-    {
-      baud = baudRate[serialNumber - 1];
-      ser->end();
-      ser->begin( baud );
-      while( !*ser ) { dly_tsk( 5UL ); }
-    }
-
     // listen and accept
     server.begin();
     while( 1 )
@@ -469,8 +504,7 @@ static void seriOutput( const char *str )
   * @brief read the baud rate selector.
   * @retval read value.
   */
-//static uint8_t brSelectorRead()
-static uint8_t chSelectorRead()
+static uint8_t brSelectorRead()
 {
   uint8_t tempUC = 0;
   if( digitalRead(BR_SEL0) == HIGH ) tempUC |= 0x01;  // BR_SEL0:PC13
@@ -483,8 +517,7 @@ static uint8_t chSelectorRead()
   * @brief read the channel selector.
   * @retval read value.
   */
-//static uint8_t chSelectorRead()
-static uint8_t brSelectorRead()
+static uint8_t chSelectorRead()
 {
   uint8_t tempUC = 0;
   if( digitalRead(CH_SEL0) == HIGH ) tempUC |= 0x01;  // CH_SEL0:PH0
