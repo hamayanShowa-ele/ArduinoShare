@@ -184,12 +184,12 @@ static const uint32_t configurable_baud_rate[] =
 
 
 static uint8_t tsk0_stk[ 128 * 8 ];
-static uint8_t tsk1_stk[ 128 * 8 ];
-static uint8_t tsk2_stk[ 128 * 8 ];
-static uint8_t tsk3_stk[ 128 * 8 ];
-static uint8_t tsk4_stk[ 128 * 8 ];
-static uint8_t tsk5_stk[ 128 * 8 ];
-static uint8_t tsk6_stk[ 128 * 8 ];
+static uint8_t tsk1_stk[ 128 * 8 + 1536 ];
+static uint8_t tsk2_stk[ 128 * 8 + 1536 ];
+static uint8_t tsk3_stk[ 128 * 8 + 1536 ];
+static uint8_t tsk4_stk[ 128 * 8 + 1536 ];
+static uint8_t tsk5_stk[ 128 * 8 + 1536 ];
+static uint8_t tsk6_stk[ 128 * 8 + 1536 ];
 static uint8_t tsk7_stk[ 128 * 5 ];
 
 /**
@@ -423,6 +423,7 @@ void server_Task( void )
   sprintf( buf, "server port=%u serial%d baud=%u", portNumber, serialNumber, baud );
   seriOutput( (const char *)buf );
 #endif
+  uint8_t rcv[ 1536 ];
   while( 1 )
   {
     EthernetServer server( portNumber );
@@ -430,16 +431,20 @@ void server_Task( void )
     server.begin();
     while( 1 )
     {
+      int rcvCount;
       EthernetClient client = server.available();
       if( client )
       {
-        int c = client.read();
-        ser->write( c );
+        rcvCount = client.available();
+        rcvCount = ( rcvCount < ser->availableForWrite() ) ? rcvCount : ser->availableForWrite();
+        for( int i = 0; i < rcvCount; i++ ) { rcv[ i ] = client.read(); /* rot_rdq(); */ }
+        ser->write( (const uint8_t *)rcv, rcvCount );
       }
-      if( ser->available() )
+      rcvCount = ser->available();
+      if( rcvCount )
       {
-        int c = ser->read();
-        server.write( c );
+        for( int i = 0; i < rcvCount; i++ ) { rcv[ i ] = ser->read(); /* rot_rdq(); */ }
+        server.write( (const uint8_t *)rcv, rcvCount );
       }
       rot_rdq();
     }
