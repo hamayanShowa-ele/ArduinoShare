@@ -29,7 +29,16 @@ private:
 public:
   MY_STREAM() { dataArray = nullptr; }
   MY_STREAM( uint32_t s, uint8_t w = 1 ) { config( s, w ); }
-  ~MY_STREAM() { if(dataArray != nullptr) { delete [] dataArray;} }
+  ~MY_STREAM() { end(); }
+
+  void end()
+  {
+    if(dataArray != nullptr)
+    {
+      if( width == 1 ) { uint8_t *a = (uint8_t *)dataArray; delete [] a; }
+      else if( width == 2 ) { uint16_t *a = (uint16_t *)dataArray; delete [] a; }
+    }
+  }
 
   void config( uint32_t s, uint8_t w = 1 )
   {
