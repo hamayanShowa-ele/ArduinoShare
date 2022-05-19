@@ -19,4 +19,4 @@ Arduino sketch and library share.
 
 2022/03/17 Add the stream fifo. #FIFO
 
-2022/05/19 Added a library to run Wiznet's W5300 on the STM32F. #WIZNET #W5500
+2022/05/19 Added a library to run Wiznet's W5300 on the STM32F. #WIZNET #W5300
