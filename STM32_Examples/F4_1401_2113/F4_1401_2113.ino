@@ -21,7 +21,7 @@
   */
 
 #include  <MY_STREAM.h>  /* https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/MY_STREAM */
-#include  <STM32_FSMC.h>  /* https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/STM32_FSMC */
+#include <STM32_FSMC.h>
 #include  <bd1401a.h>  /* https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/board_header */
 #include  <bd2113.h>  /* https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/board_header */
 
@@ -81,9 +81,9 @@ void setup()
   Serial.println( "1401A 2113 board testing program from USB Serial." );
   delay( 100UL );
 
-   /* MAX7401 low pass filter clock initialize and output. */
+   /* MAX7401 low pass filter clock initialize and output. timer3 ch3 */
   Timer3.pause();  // Pause counter and all output channels
-  Timer3.setPWM( 1, FCLK, 100 * 1000UL, 50UL );
+  Timer3.setPWM( 3, FCLK, 100 * 1000UL, 50UL );  /* timer3 ch3 */
   Timer3.resume(); // Resume counter and all output channels
 
   // External CPU BUS initialize.
@@ -95,9 +95,9 @@ void setup()
    adc1.write( 0x00FF );
    adc2.write( 0x00FF );
 
-   /* AD Convert clock initialize and output. */
+   /* AD Convert clock initialize and output. timer2 ch2 */
   Timer2.pause();  // Pause counter and all output channels
-  Timer2.setPWM( 1, CONVERT, FREQ_OF_SIGNAL * ADC_MULTIPLE_SAMPLE_RATE, 90UL );
+  Timer2.setPWM( 2, CONVERT, FREQ_OF_SIGNAL * ADC_MULTIPLE_SAMPLE_RATE, 90UL );
   Timer2.resume(); // Resume counter and all output channels
 
   adc_interrupt_count_Base = adc_interrupt_count;

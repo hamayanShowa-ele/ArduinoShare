@@ -102,11 +102,11 @@
 
 #define  GCLK        PA15
 #define  GPS_1PPS    PA1
-#define  FCLK        PB0
+#define  FCLK        PB_0_ALT1  //PB0
 #define  TRIGGER1    PD3
 #define  TRIGGER2    PD2
 #define  CONVERT_MS  PG15
-#define  CONVERT     PB3
+#define  CONVERT     PB_3  //PB3
 
 #define  AR_A0   PA0
 #define  AR_A1   PC3
