@@ -13,7 +13,7 @@
 
 int MY_STREAM::write( uint8_t dat, uint32_t dly )
 {
-  int next = dataWptr + 1;
+  uint32_t next = dataWptr + 1;
   if( next >= dataArraySize ) next = 0;
   uint32_t baseTim = millis();
   if( dly != 0UL )
@@ -31,7 +31,7 @@ int MY_STREAM::write( uint8_t dat, uint32_t dly )
 
 int MY_STREAM::write( uint16_t dat, uint32_t dly )
 {
-  int next = dataWptr + 1;
+  uint32_t next = dataWptr + 1;
   if( next >= dataArraySize ) next = 0;
   uint32_t baseTim = millis();
   if( dly != 0UL )
@@ -70,7 +70,7 @@ int MY_STREAM::write( const uint16_t *dat, int size, uint32_t dly )
 int MY_STREAM::read()
 {
   if( dataWptr == dataRptr ) return (-1);
-  int next = dataRptr + 1;
+  uint32_t next = dataRptr + 1;
   if( next >= dataArraySize ) next = 0;
   int dat;
   if( width == 1 ) { dat = *((uint8_t *)dataArray + next) & 0x000000FF; }

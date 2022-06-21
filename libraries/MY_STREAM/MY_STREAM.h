@@ -59,8 +59,8 @@ public:
 
   int write( uint8_t dat, uint32_t dly = 10UL );
   int write( const uint8_t *dat, int size, uint32_t dly = 10UL );
-  int write( uint16_t dat, uint32_t dly );
-  int write( const uint16_t *dat, int size, uint32_t dly );
+  int write( uint16_t dat, uint32_t dly = 10UL );
+  int write( const uint16_t *dat, int size, uint32_t dly = 10UL );
   int read();
   uint32_t available()
   {
