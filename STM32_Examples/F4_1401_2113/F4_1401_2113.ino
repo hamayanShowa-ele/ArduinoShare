@@ -123,6 +123,7 @@ void loop()
     {
       adcBuffer[ i ][ loopCount % ADC_MULTIPLE_SAMPLE_RATE ] = adFifo.read();
     }
+    volatile uint16_t pluseData = plFifo.read();
 
     if( (loopCount % NUMBER_OF_SAMPLES_PER_SEC) == (NUMBER_OF_SAMPLES_PER_SEC - 1) )
     {
@@ -150,15 +151,15 @@ static void cb_ADC_Interrupt( void )
   for( int i = 0; i < ADC_MAX_CHANNEL_NUMBERS / 2; i++ )
   {
     tempUS = adc1.read();
-    adFifo.write( tempUS );
+    adFifo.write( tempUS, 0UL );
   }
   for( int i = 0; i < ADC_MAX_CHANNEL_NUMBERS / 2; i++ )
   {
     tempUS = adc2.read();
-    adFifo.write( tempUS );
+    adFifo.write( tempUS, 0UL );
   }
   tempUS = pulse.read();
-  plFifo.write( tempUS );
+  plFifo.write( tempUS, 0UL );
 
   adc_interrupt_count++;
 }
