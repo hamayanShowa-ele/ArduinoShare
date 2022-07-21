@@ -22,8 +22,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "STM32_FSMC.h"
 
-extern HAL_StatusTypeDef HAL_SRAM_Init(SRAM_HandleTypeDef *hsram, FMC_NORSRAM_TimingTypeDef *Timing, FMC_NORSRAM_TimingTypeDef *ExtTiming);
-
 /* GPIO alternate initialization function. */
 static void alterPin( GPIO_TypeDef *GPIOx, uint16_t pin )
 {
