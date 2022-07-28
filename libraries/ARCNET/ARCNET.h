@@ -459,11 +459,16 @@ public:
   uint32_t recieve_count,recieve_complete_count;
   uint32_t reconfig_count,my_reconfig_count;
 
+  ARCNET() {}
   ARCNET( volatile void *a, uint32_t _p, bool c = true, bool b = true )
+  {
+    config( a, _p, c, b );
+  }
+  ~ARCNET() {}
+  void config( volatile void *a, uint32_t _p, bool c = true, bool b = true )
   {
     baseAddress = a; extiPin = _p; isCOM20022 = c; is16bit = b;
   }
-  ~ARCNET() {}
 
   int  begin( uint8_t nid, uint8_t baud = ARC_BAUD_2M5, uint8_t num = 255 );
   void end() { detachInterrupt( extiPin ); }
