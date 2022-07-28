@@ -10,11 +10,13 @@
 #define  INT_ETHERNET_BASE_ADDRESS  0x64000000
 #define  INT_ARCNET_BASE_ADDRESS    0x68000000
 #define  EXT_BASE_ADR               0x6C000000
-#define  INT_SRAM_SIZE              (524288UL * 2)  // SRAM
-//#define  INT_SRAM_SIZE              (524288UL * 1)  // MRAM
+//#define  INT_SRAM_SIZE              (524288UL * 2)  // SRAM
+#define  INT_SRAM_SIZE              (524288UL * 1)  // MRAM
 #define  W5300_MR_ADDRESS      (volatile uint16_t *)(INT_ETHERNET_BASE_ADDRESS + (0 * 2))
 #define  W5300_IDM_AR_ADDRESS  (volatile uint16_t *)(INT_ETHERNET_BASE_ADDRESS + (2 * 2))
 #define  W5300_IDM_DR_ADDRESS  (volatile uint16_t *)(INT_ETHERNET_BASE_ADDRESS + (4 * 2))
+
+#define  IC11_I2C_ADDRESS  0x20
 
 #define  BOOT1     PB2
 #define  SWDIO     PA13
@@ -40,9 +42,9 @@
 #define  SCL1  PB8
 #define  SDA1  PB9
 
-#define  LED_RED    PF8
-#define  LED_BLUE   PF9
-#define  LED_GREEN  PF10
+#define  LED_RED    PF8  // PF8
+#define  LED_BLUE   PF9  // PF9
+#define  LED_GREEN  PF10  // PF10
 #undef   LED_BUILTIN
 #define  ACTLED     PG11
 #define  LED_BUILTIN  ACTLED
@@ -93,6 +95,7 @@
 #define  BLE      PE0
 #define  BHE      PE1
 #define  IO_RST   PG13
+#define  ARC_RST  IO_RST
 
 #define  TAMPER    PC13
 #define  ETH_INT   PG6
