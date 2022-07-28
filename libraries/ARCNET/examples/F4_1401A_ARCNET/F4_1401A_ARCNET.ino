@@ -11,8 +11,8 @@
     USB speed (LOW/FULL speed)
 */
 
-#define  BD_TYPE_1401
-//#define  BD_TYPE_1415
+//#define  BD_TYPE_1401
+#define  BD_TYPE_1415
 
 /* Includes ------------------------------------------------------------------*/
 #include  <STM32F_CPU_Identity.h>  /* https://github.com/hamayanShowa-ele/ArduinoShare/tree/main/libraries/STM32F_CPU_Identity */
@@ -73,7 +73,7 @@ void setup()
 #elif defined( BD_TYPE_1415 )
   fsmc_address( 19 );  // set address bus size
   fsmc_data( 16 );  // set data bus size.
-  fsmc_sram( FSMC_NORSRAM_BANK1, FSMC_NORSRAM_MEM_BUS_WIDTH_16, 10,40,10,40, 0 );
+  fsmc_sram( FSMC_NORSRAM_BANK1, FSMC_NORSRAM_MEM_BUS_WIDTH_16, 1,4,1,4, 0 );
   fsmc_sram( FSMC_NORSRAM_BANK2, FSMC_NORSRAM_MEM_BUS_WIDTH_16, 1,4,1,4, 0 );
   fsmc_sram( FSMC_NORSRAM_BANK3, FSMC_NORSRAM_MEM_BUS_WIDTH_16, 3,6,3,6, 0 );
   /* read cycle:209ns, read address setup time:80ns, read width:86ns */
