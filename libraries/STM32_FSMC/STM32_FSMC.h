@@ -36,7 +36,7 @@ extern "C" {
 #include  <stm32f1xx_hal_gpio.h>
 #endif /* defined( STM32F4xx ) */
 
-#ifdef __STM32F4xx_LL_FMC_H
+#ifdef __STM32F4xx_LL_FMC_H  // defined(STM32F446xx)
 #define  FSMC_NORSRAM_BANK1  FMC_NORSRAM_BANK1
 #define  FSMC_NORSRAM_BANK2  FMC_NORSRAM_BANK2
 #define  FSMC_NORSRAM_BANK3  FMC_NORSRAM_BANK3

@@ -33,7 +33,7 @@ static void alterPin( GPIO_TypeDef *GPIOx, uint16_t pin )
   else if( GPIOx == GPIOF ) __HAL_RCC_GPIOF_CLK_ENABLE();
   else if( GPIOx == GPIOG ) __HAL_RCC_GPIOG_CLK_ENABLE();
 #if defined( STM32F4xx )
-else if( GPIOx == GPIOH ) __HAL_RCC_GPIOH_CLK_ENABLE();
+  else if( GPIOx == GPIOH ) __HAL_RCC_GPIOH_CLK_ENABLE();
 #endif /* defined( STM32F4xx ) */
   else return;
 
@@ -209,6 +209,7 @@ void fsmc_sram(
   /** Perform the SRAM? memory initialization sequence */
   SRAM_HandleTypeDef hsram;
 //  HAL_SRAM_DeInit( &hsram );
+
   hsram.Instance = FSMC_NORSRAM_DEVICE;
   hsram.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
   /* hsram.Init */
@@ -218,32 +219,38 @@ void fsmc_sram(
   hsram.Init.MemoryDataWidth = width;
   hsram.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
   hsram.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
-  hsram.Init.WrapMode = FSMC_WRAP_MODE_DISABLE;
   hsram.Init.WaitSignalActive = FSMC_WAIT_TIMING_BEFORE_WS;
   hsram.Init.WriteOperation = FSMC_WRITE_OPERATION_ENABLE;
   hsram.Init.WaitSignal = FSMC_WAIT_SIGNAL_DISABLE;
   hsram.Init.ExtendedMode = FSMC_EXTENDED_MODE_ENABLE;
   hsram.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
   hsram.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
+  #if defined( __STM32F4xx_LL_FMC_H )
+  hsram.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
+  hsram.Init.WriteFifo = FMC_WRITE_FIFO_DISABLE;
+  #endif /* defined( __STM32F4xx_LL_FMC_H ) */
+  #if defined( STM32F1xx_LL_FSMC_H )
   hsram.Init.PageSize = FSMC_PAGE_SIZE_NONE;
+  hsram.Init.WrapMode = FSMC_WRAP_MODE_DISABLE;
+  #endif /* defined( STM32F1xx_LL_FSMC_H ) */
 
   /* Timing */
-  FSMC_NORSRAM_TimingTypeDef Timing;
-  Timing.AddressSetupTime = rAS;
-  Timing.AddressHoldTime = 15;
-  Timing.DataSetupTime = rDS;
-  Timing.BusTurnAroundDuration = 15;
-  Timing.CLKDivision = 15;
-  Timing.DataLatency = 15;
+  FSMC_NORSRAM_TimingTypeDef Timing = {0};
+  Timing.AddressSetupTime = rAS;  // The minimum is 0 and the maximum is 15.
+  Timing.AddressHoldTime = 1;  // 1:The minimum is 1 and the maximum is 15.
+  Timing.DataSetupTime = rDS;  // The minimum is 1 and the maximum is 255.
+  Timing.BusTurnAroundDuration = 15;  // 15:The minimum is 0 and the maximum is 15.
+  Timing.CLKDivision = 16;  // The minimum is 2 and the maximum is 16.
+  Timing.DataLatency = 17;  // The minimum is 2 and the maximum is 17.
   Timing.AccessMode = FSMC_ACCESS_MODE_A;
   /* ExtTiming */
-  FSMC_NORSRAM_TimingTypeDef ExtTiming;
-  ExtTiming.AddressSetupTime = wAS;
-  ExtTiming.AddressHoldTime = 15;
-  ExtTiming.DataSetupTime = wDS;
-  ExtTiming.BusTurnAroundDuration = 15;
-  ExtTiming.CLKDivision = 15;
-  ExtTiming.DataLatency = 15;
+  FSMC_NORSRAM_TimingTypeDef ExtTiming = {0};
+  ExtTiming.AddressSetupTime = wAS;  // The minimum is 0 and the maximum is 15.
+  ExtTiming.AddressHoldTime = 1;  // 1:The minimum is 1 and the maximum is 15.
+  ExtTiming.DataSetupTime = wDS;  // The minimum is 1 and the maximum is 255.
+  ExtTiming.BusTurnAroundDuration = 15;  // 15:The minimum is 0 and the maximum is 15.
+  ExtTiming.CLKDivision = 16;  // The minimum is 2 and the maximum is 16.
+  ExtTiming.DataLatency = 17;  // The minimum is 2 and the maximum is 17.
   ExtTiming.AccessMode = FSMC_ACCESS_MODE_A;
 
   if (HAL_SRAM_Init(&hsram, &Timing, &ExtTiming) != HAL_OK)
