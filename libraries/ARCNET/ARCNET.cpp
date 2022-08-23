@@ -146,7 +146,6 @@ int ARCNET::write( uint16_t adr, const uint16_t *dat, int size )
 /**
   * @brief page write.
   * Since the packet size is 1-253 bytes when short, and 257-508 bytes when long,
-  *  0-padding must be performed when the packet size is 254-256 bytes.
   * @retval count value or A negative value indicating an illegal termination..
   */
 int ARCNET::pageWrite( int page, uint8_t did, const uint8_t *dat, int size )
@@ -353,10 +352,10 @@ void ARCNET::intHandler()
 
   /* check status register. */
   /* reconfig */
-  Serial.print( 'i' );
+//  Serial.print( 'i' );
   if( status & ARC_REG_STATUS_RECON )
   {
-    Serial.print( 'c' );
+//    Serial.print( 'c' );
     clrReconFlag();  /* Clearing the RECON bit */
     reconfig_count++;
     if( diag & ARC_REG_DIAG_MY_RECON ) { my_reconfig_count++; }
@@ -364,7 +363,7 @@ void ARCNET::intHandler()
   /* recieve interrupt. */
   if( status & ARC_REG_STATUS_RI_TRI )
   {
-    Serial.print( 'r' );
+//    Serial.print( 'r' );
     clrIMASK_RI_TRI();
     recieve_count++;
     if( ++rcvPageW > COM20022_END_RECIEVE_PAGE ) rcvPageW = COM20022_ENTRY_RECIEVE_PAGE;
@@ -374,7 +373,7 @@ void ARCNET::intHandler()
   /* transmit end interrupt. */
   if( status & ARC_REG_STATUS_TA_TTA )
   {
-    Serial.print( 't' );
+//    Serial.print( 't' );
     clrIMASK_TA_TTA();
     if( status & ARC_REG_STATUS_TMA ) { transmit_complete_count++; }
   }
@@ -382,14 +381,14 @@ void ARCNET::intHandler()
   /* check diagnostic register. */
   if( diag & ARC_REG_DIAG_EXC_NAK )
   {
-    Serial.print( 'e' );
+//    Serial.print( 'e' );
     clrPORFlag();  /* clear POR and diagnostioc EXCNAK status bit. */
     disTransmitter();  /* disable transmitter. */
     clrIMASK_TA_TTA();
   }
   if( diag & ARC_REG_DIAG_NEW_NEXTID )
   {
-    Serial.print( 'n' );
+//    Serial.print( 'n' );
     next_id = NEXTID();
   }
 }
