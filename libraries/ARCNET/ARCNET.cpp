@@ -24,7 +24,7 @@ int ARCNET::begin( uint8_t nid, uint8_t baud, uint8_t node_number )
   /* dummy read status. */
   tempUS = STATUS();
   /* select data bus type. */
-  BUSCTRL( (is16bit) ? ARC_REG_BUSCTRL_W16 : 0 );
+  BUSCTRL( (is16bit) ? ARC_REG_BUSCTRL_W16 : ARC_REG_BUSCTRL_W08 );
   /* Software resetting. */
   softReset();
   /* transmit disable. */
@@ -153,7 +153,6 @@ int ARCNET::pageWrite( int page, uint8_t did, const uint8_t *dat, int size )
 {
   if( size == 0 ) { return 0; }
   else if( size > (512 - 4) ) { size = 512 - 4; }
-  else if( size >= 254 && size <= 256 ) { size = 257; }
 
   uint16_t adr;
   if( page == ARC_PAGE_0 ) adr = (512 * 0);
@@ -185,7 +184,7 @@ int ARCNET::pageWrite( int page, uint8_t did, const uint8_t *dat, int size )
   ADDRESS( (ARC_REG_ADR_HIGH_AUTO_INC << 8) + adr + count );
   for( int i = count; i < limit; i++ ) { write( *dat++ ); }
 
-  return limit - count;
+  return size;
 }
 
 /**
@@ -354,10 +353,10 @@ void ARCNET::intHandler()
 
   /* check status register. */
   /* reconfig */
-//  Serial.print( 'i' );
+  Serial.print( 'i' );
   if( status & ARC_REG_STATUS_RECON )
   {
-//    Serial.print( 'c' );
+    Serial.print( 'c' );
     clrReconFlag();  /* Clearing the RECON bit */
     reconfig_count++;
     if( diag & ARC_REG_DIAG_MY_RECON ) { my_reconfig_count++; }
@@ -365,7 +364,7 @@ void ARCNET::intHandler()
   /* recieve interrupt. */
   if( status & ARC_REG_STATUS_RI_TRI )
   {
-//    Serial.print( 'r' );
+    Serial.print( 'r' );
     clrIMASK_RI_TRI();
     recieve_count++;
     if( ++rcvPageW > COM20022_END_RECIEVE_PAGE ) rcvPageW = COM20022_ENTRY_RECIEVE_PAGE;
@@ -375,7 +374,7 @@ void ARCNET::intHandler()
   /* transmit end interrupt. */
   if( status & ARC_REG_STATUS_TA_TTA )
   {
-//    Serial.print( 't' );
+    Serial.print( 't' );
     clrIMASK_TA_TTA();
     if( status & ARC_REG_STATUS_TMA ) { transmit_complete_count++; }
   }
@@ -383,14 +382,14 @@ void ARCNET::intHandler()
   /* check diagnostic register. */
   if( diag & ARC_REG_DIAG_EXC_NAK )
   {
-//    Serial.print( 'e' );
+    Serial.print( 'e' );
     clrPORFlag();  /* clear POR and diagnostioc EXCNAK status bit. */
     disTransmitter();  /* disable transmitter. */
     clrIMASK_TA_TTA();
   }
   if( diag & ARC_REG_DIAG_NEW_NEXTID )
   {
-//    Serial.print( 'n' );
+    Serial.print( 'n' );
     next_id = NEXTID();
   }
 }
