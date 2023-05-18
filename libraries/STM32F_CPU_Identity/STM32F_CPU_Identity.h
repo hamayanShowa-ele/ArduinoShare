@@ -41,10 +41,18 @@ public:
   uint32_t pclk2() { return HAL_RCC_GetPCLK2Freq(); }
   void uID( uint32_t *id )
   {
+#if 0
     *(id + 0) = *((uint32_t *)(UID_BASE_ADDRESS + 0)); 
     *(id + 1) = *((uint32_t *)(UID_BASE_ADDRESS + 4)); 
     *(id + 2) = *((uint32_t *)(UID_BASE_ADDRESS + 8)); 
+#else
+    *(id + 0) = HAL_GetUIDw0(); 
+    *(id + 1) = HAL_GetUIDw1(); 
+    *(id + 2) = HAL_GetUIDw2(); 
+#endif
   }
+  uint32_t revID() { return HAL_GetREVID(); }
+  uint32_t devID() { return HAL_GetDEVID(); }
 
   void mccConfig( uint32_t RCC_MCOx, uint32_t RCC_MCOSource, uint32_t RCC_MCODiv )
   {
